@@ -93,6 +93,21 @@ class MenuController extends BaseController
      */
 
     public function getMenuItems() {
-        throw new \Exception('implement in coding task 3');
+        $menuItems = MenuItem::with('childrenRecursive')->whereNull('parent_id')->get();
+
+        $nestedMenu = [];
+        foreach ($menuItems as $menuItem) {
+            $nestedMenu[] = $this->formatMenuItem($menuItem);
+        }
+        return $nestedMenu;
+    }
+
+    public function formatMenuItem($menuItem) {
+        $formattedMenuItem = $menuItem->toArray();
+        $formattedMenuItem['children'] = [];
+        foreach ($menuItem->childrenRecursive as $childMenuItem) {
+            $formattedMenuItem['children'][] = formatMenuItem($childMenuItem);
+        }
+        return $formattedMenuItem;
     }
 }
